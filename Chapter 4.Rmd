@@ -1,0 +1,77 @@
+---
+title: "Chapter 4 HW"
+author: "Bryan Li"
+date: "2/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+<style>
+  .2-col {
+    columns: 2 200px;
+    -webkit-columns: 2 200px;
+    -moz-columns: 2 200px;
+  }
+</style>
+
+###20)
+
+<div class="2-col">
+```{r hrrcne1, fig.width=4, fig.height=3, message=FALSE, echo=FALSE}
+hurricane1 <- data.frame("num"=c(3, 2, 1, 2, 4, 3, 7, 2, 3, 3, 2, 5, 2, 2, 4, 2, 2, 6, 0, 2, 5, 1, 3, 1, 0, 3), "dates"=1944:1969)
+qplot(hurricane1[["num"]], geom="histogram", binwidth=1, main="Hurricanes per Year from 1944 to 1969", xlab="Num. hurricanes per year")
+```
+```{r hrrcne2, fig.width=4, fig.height=3, message=FALSE, echo=FALSE}
+hurricane2 <- data.frame("num"=c(2,1,0,1,2,3,2,1,2,2,2,3,1,1,1,3,0,1,3,2,1,2,1,1,0,5,6,1,3,5,3), "dates"=1970:2000)
+qplot(hurricane2[["num"]], geom="histogram", binwidth=1, main="Hurricanes per Year from 1970 to 2000", xlab="Num. hurricanes per year")
+```
+</div>
+
+The hurricanes from 1944 to 1969 tend to center around 2-3, and is mostly symmetrical with only a bit of a right skew. The hurricanes from 1970 to 2000 tend to center around 1-2 and skews more heavily towards the right.
+
+###22)
+```{r weed, fig.width=4, fig.height=3, message=FALSE, echo=FALSE}
+weed <- c(10, 19, 17, 40, 5, 12, 21, 2, 10, 37, 19, 6, 31, 23, 6, 7, 53, 15, 6, 27)
+qplot(weed, geom="histogram", binwidth=5, xlab="% Freshmen who used Marijuana")
+```
+
+The amount of 9th graders who have experienced marijuana skews right heavily and is centered around 5 to 10 percent.
+
+###38)
+
+####a/b)
+<div style="2-col">
+```{r hist-drunk, fig.width=4, fig.height=3, message=FALSE,echo=FALSE}
+accidents <- data.frame(deaths=c(25.2, 23.6, 23.8, 22.7, 24.0, 23.6, 23.6, 
+               22.4, 22.0, 19.9, 17.9, 17.5, 16.6, 17.2,
+               17.2, 16.5, 16.0, 16.0, 16.7, 16.7), year=1982:2001)
+qplot(accidents[["deaths"]], geom="histogram", binwidth=1, xlab="Deaths per year (thousands)")
+```
+```{r time-drunk, fig.width=4, fig.height=3, message=FALSE,echo=FALSE}
+ggplot(accidents, aes(x=year, y=deaths)) + geom_point() + labs(x="Deaths (thousands)", y="Year")
+```
+</div>
+
+####c)
+Deaths from drunk driving have been steadily falling over time. There are also two modes, which implies that there was something that changed in between 1990 and 1993 that caused a relatively significant drop in the amount of drunk driving-related deaths.
+
+###39)
+####a)
+The huge skew towards the right makes it hard to summarize center and spread as it is hard to assess the data and its center and spread.
+
+####b)
+The data can be re-expressed by using a logarithmic or fractional exponent (e.g., square root) function.
+
+###41)
+####a)
+Re-expression with logarithms is better as it is closer to a symmetrical shape.
+
+####b)
+In the square root re-expression, 50 indicates assets of 2500 as it is squared.
+
+####c)
+In the logarithmic re-expression, the value 3 indicates assets of 1000.
