@@ -52,7 +52,7 @@ accidents <- data.frame(deaths=c(25.2, 23.6, 23.8, 22.7, 24.0, 23.6, 23.6,
 qplot(accidents[["deaths"]], geom="histogram", binwidth=1, xlab="Deaths per year (thousands)")
 ```
 ```{r time-drunk, fig.width=4, fig.height=3, message=FALSE,echo=FALSE}
-ggplot(accidents, aes(x=year, y=deaths)) + geom_point() + labs(x="Deaths (thousands)", y="Year")
+ggplot(accidents, aes(x=year, y=deaths)) + geom_point() + labs(x="Year", y="Deaths (thousands)")
 ```
 </div>
 
