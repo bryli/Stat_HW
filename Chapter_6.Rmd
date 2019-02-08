@@ -1,5 +1,5 @@
 ---
-title: "Chapter 5"
+title: "Chapter 6"
 author: "Bryan Li"
 date: "2/7/2019"
 output: html_document
