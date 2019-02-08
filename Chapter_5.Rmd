@@ -1,0 +1,93 @@
+---
+title: "Chapter 5"
+author: "Bryan Li"
+date: "2/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+<style>
+  .2-col {
+    columns: 2 200px;
+    -webkit-columns: 2 200px;
+    -moz-columns: 2 200px;
+  }
+</style>
+
+####2)
+a) Range: 7.45 - 4.15 = <b>3.3</b> / IQR: 6.2 - 5.6 = **0.6**
+b) The distribution of the weights is skewed as the mean weight is 6 pounds whereas the median weight is 6.55 pounds on a range of 3.3. It would be **skewed towards the left.**
+c) All values would be **multiplied by 16.** The range would be 52.8; the mean, 96; the median 104.8; the first and third quartiles 89.6 and 99.2; the standard deviation 10.4, and the IQR 9.6.
+d) The mean would be **126** (ounces), the first and third quartiles **119.6** and **129.2**, and the mean **134.8**. The IQR, standard deviation, and range would **remain the same**.
+e) The **median, IQR, and quartiles** may not change.
+
+####17)
+a)
+```{r autoecon, fig.width=4, fig.height=3, message=FALSE, echo=FALSE}
+xseq <- seq(0, 49.6, .001)
+densities <- dnorm(xseq, 24.8, 6.2)
+plot(xseq, densities, xlab="Miles per Gallon", ylab="Density", type="l", lwd=2, cex=2, main="Normal Model for Auto Fuel Economy")
+abline(v=24.8)
+abline(v=24.8-6.2, col="red")
+abline(v=24.8-12.4, col="yellow")
+abline(v=24.8+6.2, col="red")
+abline(v=24.8+12.4, col="yellow")
+abline(v=24.8-18.6, col="green")
+abline(v=24.8+18.6, col="green")
+```
+
+The center line above shows the center of the normal distribution. The two red lines denote the boundaries (of mpg) of the area which contains approximately 68% of the population. Similarly, the yellow lines denote the area that contains 95%, and the green lines 99.7%.
+
+b) I would expect the central 68% of autos to be found from **`r 24.8-6.2`** to **`r 24.8+6.2`**.
+
+c) Approximately **`r 100*(1-pnorm(31, 24.8, 6.2))`%** of autos should get more than 31 mpg.
+
+d) Approximately **`r 100*(pnorm(37, 24.8, 6.2) - pnorm(31, 24.8, 6.2))`%** of autos should get between 31 and 37 mpg.
+
+e) The gas mileage of the worst 2.5% of all cars is at **`r qnorm(0.025, 24.8, 6.2)`** or lower mpg.
+
+####24)
+It is appropriate to apply a normal model as the data seems to be symmetric and generally fits the bell curve. It does not skew to either side and fits a line of fit very well. Additionally, in the box plot 50% of the data fits very nicely in a somewhat narrow stretch near the middle of the data.
+
+####33)
+a) <b>`r 100*(1 - pnorm(1250, 1152, 84))`%</b> of steers weigh over 1250 pounds.
+b) <b>`r 100*pnorm(1200, 1152, 84)`%</b> of steers weigh under 1200 pounds.
+c) <b>`r 100*(pnorm(1100, 1152, 84) - pnorm(1000, 1152, 84))`%</b> of steers weigh between 1000 and 1100 pounds.
+
+<!--```
+a) 100*(1 - pnorm(1250, 1152, 84))
+b) 100*pnorm(1200, 1152, 84)
+c) 100*(pnorm(1100, 1152, 84) - pnorm(1000, 1152, 84))
+```-->
+####35)
+a) The cutoff for the highest 10% of weights is <b>`r qnorm(.9, 1152, 84)` pounds</b>.
+b) The cutoff for the lowest 20% of weights is <b>`r qnorm(.2, 1152, 84)` pounds</b>.
+c) The cutoffs for the middle 40% of weights are <b>`r qnorm(.3, 1152, 84)` pounds</b> and <b>`r qnorm(.7, 1152, 84)` pounds</b>.
+
+<!--```
+a) qnorm(.9, 1152, 84)
+b) qnorm(.2, 1152, 84)
+c) qnorm(.3, 1152, 84) and qnorm(.7, 1152, 84)
+```-->
+
+####50)
+```{r fndTomatoSD, message=FALSE, echo=FALSE}
+sdtomatoes <<- uniroot(function (x) (qnorm(.11, 74, x) - 70), lower=0, upper=100)$root
+```
+a) The standard deviation of the weights of Romas being grown is <b>`r sdtomatoes`</b>.
+b) The target mean should be <b>`r uniroot(function (x) (qnorm(.04, x, sdtomatoes) - 70), lower=0, upper=150)$root`</b>.
+c) The standard deviation of the weights of these new Romas is <b>`r uniroot(function (x) (qnorm(.04, 75, x) - 70), lower=0, upper=100)$root`</b>.
+d) The original variety of Roma tomatoes have a wider spread regarding their size, whereas the new variety has a lesser spread. Both varieties have a symmetric shape and approximately equal centers.
+
+<!--```
+a) uniroot(function (x) (qnorm(.11, 74, x) - 70), lower=0, upper=100)$root
+Store above in some global variable - lets call it "ANSWERA". (use <<- for globals)
+
+b) uniroot(function (x) (qnorm(.04, x, ANSWERA) - 70), lower=0, upper=150)$root
+
+c) uniroot(function (x) (qnorm(.04, 75, x) - 70), lower=0, upper=100)$root
+```-->
