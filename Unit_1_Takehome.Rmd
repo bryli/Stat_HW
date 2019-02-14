@@ -1,0 +1,170 @@
+---
+title: "Unit 1 Takehome"
+author: "Bryan Li"
+date: "2/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=3)
+library(ggplot2)
+pkg <- c("ggplot2", "knitr", "dplyr")
+getpkgs <- function(pkgs){
+  new.pkg <- pkg[!(pkg %in% installed.packages())]
+  if (length(new.pkg)) {
+    install.packages(new.pkg, repos = "http://cran.rstudio.com")
+  }
+}
+
+if (file.exists("cache/yelp_data.Rdata")){
+  load("cache/yelp_data.Rdata")
+  getpkgs(pkg)
+} else {
+  pkg <- c(pkg, "readxl")
+  getpkgs(pkg)
+  library(readxl)
+  yelp_data <- read_excel("yelp data.xlsx") #Replace with path to file
+  save(yelp_data, file="cache/yelp_data.Rdata")
+}
+library(ggplot2)
+library(knitr)
+library(dplyr)
+
+yelp_data$is_open <- as.vector(unlist(lapply(yelp_data$is_open, function(x) {x[!x %in% c(0, 1)] <- NA
+  x==1})))
+full_summary <- function(dataset){
+  tmp_summary <- summary(dataset)
+  tmp_summary[c("IQR", "Variance", "Standard Deviation")] <- c(IQR(dataset), var(dataset), sd(dataset))
+  tmp_names <- names(tmp_summary)
+  tmp_summary <- tmp_summary[c(tmp_names[-4], tmp_names[4])]
+  names(tmp_summary) <- c("Minimum","1st Quartile","Median","3rd Quartile", "Maximum", "IQR", "Variance", "Standard Deviation", "Mean")
+  return(as.array(tmp_summary))
+}
+get_fences <- function(full_sum_closed, full_sum_open){
+  tmp_matrix <- matrix(c(full_sum_closed[["1st Quartile"]] - full_sum_closed[["IQR"]], full_sum_closed[["3rd Quartile"]] + full_sum_closed[["IQR"]], full_sum_open[["1st Quartile"]] - full_sum_open[["IQR"]], full_sum_open[["3rd Quartile"]] + full_sum_open[["IQR"]]), ncol = 2, byrow=TRUE)
+  colnames(tmp_matrix) <- c("Lower Fence", "Upper Fence")
+  rownames(tmp_matrix) <- c("Closed", "Open")
+  return(as.table(tmp_matrix))
+}
+open_reviews <- as.numeric(unlist(yelp_data[yelp_data$is_open, "review_count"]))
+closed_reviews <- as.numeric(unlist(yelp_data[!yelp_data$is_open, "review_count"]))
+reexp_data <- yelp_data
+reexp_data["is_open"] <- factor(yelp_data$is_open, levels=c(TRUE, FALSE), labels=c("Open", "Closed"))
+reexp_data["review_count"] <- log10(as.numeric(unlist(yelp_data[["review_count"]])))
+open_summary <- full_summary(open_reviews)
+closed_summary <- full_summary(closed_reviews)
+```
+
+####a)
+The question I plan to answer is "How does the open status (open or closed) affect the number of reviewers? What are the differences and similarities?" I chose this question as the number of reviewers has a much greater range of possible values compared to stars, which has to be in increments of .5 between 1 and 5. Additionally, the open status has plenty of data points for each of the two levels, providing ample data to analyze.
+
+####b)
+For closed businesses:
+
+```{r echo=FALSE, results="asis"}
+kable(closed_summary, caption="Closed Business Values", col.names=c("Statistic", "Value"), digits=3)
+```
+
+For open businesses:
+
+```{r echo=FALSE, results="asis"}
+kable(open_summary, caption="Open Business Values", col.names=c("Statistic", "Value"), digits=3)
+```
+
+####c)
+These graphs use a base-10 logarithmic re-expression of data.
+```{r closed_hist, fig.width=12, fig.height=3, message=FALSE, echo=FALSE}
+ggplot(data.frame("closed_reviews"=log10(closed_reviews)), aes(x=closed_reviews)) + geom_histogram(aes(y=..density..), color="black", fill="red", binwidth=0.1) + scale_x_continuous("# Ratings (log10)") + ggtitle("# of Ratings for Closed Businesses") + geom_density(alpha=.5, fill="grey")
+```
+
+```{r open_hist, fig.width=12, fig.height=3, message=FALSE, echo=FALSE}
+ggplot(data.frame("open_reviews"=log10(open_reviews)), aes(x=open_reviews)) + geom_histogram(aes(y=..density..), color="black", fill="green", binwidth=0.1) + scale_x_continuous("# Ratings (log10)") + ggtitle("# of Ratings for Open Businesses") + geom_density(alpha=.5, fill="grey")
+```
+
+```{r business_boxes, fig.width=12, fig.height=3, message=FALSE, echo=FALSE}
+ggplot(select(reexp_data, review_count, is_open), aes(x=is_open, y=review_count, fill=is_open)) +scale_fill_manual(guide=FALSE, labels=c("Open", "Closed"), values=c("green", "red")) + scale_x_discrete(name="Open Status") + scale_y_continuous("Number of Reviews (log10)", breaks=seq(0,4,.25), limits=c(0.25, 4)) + geom_boxplot() + coord_flip() + ggtitle("Boxplot of Review Counts based on Open Status")
+```
+
+####d)
+There are many outliers in the data sets used. The fences for the data are as follows:
+
+```{r echo=FALSE, results="asis"}
+fences_log <- get_fences(full_summary(log10(closed_reviews)), full_summary(log10(open_reviews)))
+kable(fences_log, caption="Fences for Businesses (log10)", digits=3)
+```
+
+```{r echo=FALSE, results="asis"}
+fences_norm <- get_fences(closed_summary, open_summary)
+kable(fences_norm, caption="Fences for Businesses (normal)", digits=3)
+```
+
+These are calculated by doing `1st_quartile - 1.5 * IQR` for lower fences and `3rd_quartile + 1.5 * IQR` for upper fences.
+
+Work below, for normal dataset (results in table):
+
+CLOSED:<br>
+**Lower Fence:** `r closed_summary[["1st Quartile"]]` - 1.5 * `r closed_summary[["IQR"]]`<br>
+**Upper Fence:** `r closed_summary[["3rd Quartile"]]` + 1.5 * `r closed_summary[["IQR"]]`
+
+OPEN:<br>
+**Lower Fence:** `r open_summary[["1st Quartile"]]` - 1.5 * `r open_summary[["IQR"]]`<br>
+**Upper Fence:** `r open_summary[["3rd Quartile"]]` + 1.5 * `r open_summary[["IQR"]]`
+
+```{r echo=FALSE, results="asis"}
+filtered_open <- open_reviews[open_reviews %in% as.vector(fences_norm)[2]:as.vector(fences_norm)[4]]
+filtered_closed <- closed_reviews[closed_reviews %in% as.vector(fences_norm)[1]:as.vector(fences_norm)[3]]
+kable(full_summary(filtered_closed), caption="Filtered Closed Business Values", col.names=c("Statistic", "Value"), digits=3)
+```
+
+```{r echo=FALSE, results="asis"}
+kable(full_summary(filtered_open), caption="Filtered Open Business Values", col.names=c("Statistic", "Value"), digits=3)
+```
+
+####e)
+Z-score can be calculated for a data point in the filtered dataset with value `x` by calculating `(x-mean(overall))/sd(overall)`.
+
+For example, the mean of the closed business reviews is 22.17 whereas its standard deviation is 63.92. Thus, given points 12, 3, and 23, their z-scores are:
+
+(12-22.17)/63.92 = **-0.16**<br>
+(3-22.17)/63.92 = **-0.30**<br>
+(23-22.17)/63.92 = **0.01**
+
+The averages of the Z-scores of the filtered datasets (without outliers) using the overall mean and standard deviations are **`r (mean(filtered_closed) - mean(closed_reviews))/sd(closed_reviews)`** for closed businesses and **`r (mean(filtered_open) - mean(open_reviews))/sd(open_reviews)`** for open businesses.
+
+The fact that both z-score means are negative shows that on average the means of each dataset are greater than x. Specifically, on average values are approximately **-0.2** standard deviations from the mean in both datasets.
+
+####f)
+
+```{r open_qq, fig.width=5, fig.height=5, message=FALSE, echo=FALSE}
+if (file.exists("cache/open_qqplot.Rdata")){
+  load("cache/open_qqplot.Rdata")
+} else {
+  open_qqplot <- ggplot(data.frame(open_reviews), aes(sample=open_reviews)) + stat_qq() + stat_qq_line() + ggtitle("Q-Q Plot of Open Business Reviews") + scale_y_continuous("Sample Quantities") + scale_x_continuous("Theoretical Quantiles")
+  save(open_qqplot, file="cache/open_qqplot.Rdata")
+}
+open_qqplot
+
+```
+
+```{r closed_qq, fig.width=5, fig.height=5, message=FALSE, echo=FALSE}
+if (file.exists("cache/closed_qqplot.Rdata")){
+  load("cache/closed_qqplot.Rdata")
+} else {
+  closed_qqplot <- ggplot(data.frame(closed_reviews), aes(sample=closed_reviews)) + stat_qq() + stat_qq_line() + ggtitle("Q-Q Plot of Closed Business Reviews") + scale_y_continuous("Sample Quantities") + scale_x_continuous("Theoretical Quantiles")
+  save(closed_qqplot, file="cache/closed_qqplot.Rdata")
+}
+closed_qqplot
+```
+
+I do not believe the datasets are even close to a normal distribution. When looking at both the quantile-quantile plot (which are compared to normal distributions) and the histograms, there is a very obvious right skew. Note especially that the histograms are already using a reexpression using log base 10, which means the original data was skewed right even more than it appears.
+
+Even the boxplots signify a very heavy skew to the right - again, this is already using log base 10 for reexpression, which lesses then right skew greatly. Therefore, it is quite clear that the datasets are far from drawn from normal distribution.
+
+####g)
+<!-- center shape spread-->
+To begin with, neither of the datasets are well-behaved, both having a massive right skew. Based on the quantile-quantile plots along with the histograms and boxplots, they do not fit anything close to a normal distribution, again because of the right skew. Thus, using resistant statistics for center and spread - specifically, median and IQR - is greatly preferred to using mean and standard deviation.
+
+Regarding spread, the number of reviews of open businesses have an IQR (measuring spread) of 20, whereas the number of reviews of closed businesses have an IQR of 15. This shows a greater amount of spread in the numbers of reviews of open businesses compared to closed businesses. 
+
+The center of the opened business review counts was 9 (the median) whereas that of closed business review counts was 8. This implies that on average, opened businesses get more reviews than closed businesses - which makes sense, given that closed businesses will not get any further customers.
