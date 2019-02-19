@@ -1,0 +1,64 @@
+---
+title: "Chapter 7"
+author: "Bryan Li"
+date: "2/17/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+<style>
+  .2-col {
+    columns: 2 200px;
+    -webkit-columns: 2 200px;
+    -moz-columns: 2 200px;
+  }
+</style>
+
+####15)
+```{r echo=FALSE}
+lunchtime <- data.frame(
+  calories = c(472, 498, 465, 456, 423, 437, 508, 431, 479, 454, 450, 410, 504, 437, 489, 436, 480, 439, 444, 408),
+
+  times = c(21.4, 30.8, 37.7, 33.5, 32.8, 39.5, 22.8, 34.1, 33.9, 43.8, 42.4, 43.1, 29.2, 31.3, 28.6, 32.9, 30.6, 35.1, 33.0, 43.7)
+)
+lt_sum <- summary(lm(lunchtime))
+```
+a) The correlation for the data is `r lt_sum$r.squared`.
+b) The correlation would not change, as it does not depend on the values themselves; it depends on the z-scores instead. Dividing each element by 60 would not affect the z-scores.
+c) The relatively low (close-to-zero) correlation means that there is likely only a weak connection between food consumption based on time spent eating.
+d) The conclusion drawn by said analyst is not an appropriate one as he confidently says there is a connection between the two variables. However, based on the low correlation, the reality is quite the contrary - there is most likely a weak connection at best.
+
+####22
+a) Winning teams do tend to enjoy greater attendance at home games. Using the graph, there seems to be an upward trend in attendance as wins goes up. However, assuming the data is linear, this is a somewhat weak association, seen in the correlation of 0.557.
+
+b) Attendance is most likely more strongly associated with runs than wins, given the higher correlation of 0.74 for runs against attendance compared to the 0.557 of wins and attendance. However, this is assuming a linear association, as correlation is not a good measure for anything otherwise. Also, the correlation may change when taking outliers out of the data, so care must be used when looking at correlation.
+
+c) Scoring more runs is relatively strongly associated with more wins, with a correlation of 0.74 (assuming the relationship is linear).
+
+####35)
+a)
+```{r planets, fig.width=4, fig.height=3, message=FALSE, echo=FALSE}
+planets <- data.frame(
+  position=c(1:9),
+  distance=c(36,67,93,142,484,887,1784,2796,3666)
+)
+ggplot(planets, aes(x=position, y=distance)) + geom_point() + scale_x_continuous("Planet Number") + ggtitle("Planet Location based on Number") + scale_y_continuous("Distance from Sun (million miles)")
+```
+
+The direction of association is positive. The scatterplot does not look linear, although it does seem to follow some consistent form. The points are also tightly clustered around that (non-linear) form, meaning it has strong strength.
+
+b) Planet position is a categorical variable, so the correlation would not make sense as it is not comparison of a quantitative variable to another.
+
+c)
+```{r log_planets, fig.width=4, fig.height=3, message=FALSE, echo=FALSE}
+log_planets <- data.frame(
+  position=c(1:9),
+  distance=log10(planets$distance)
+)
+ggplot(log_planets, aes(x=position, y=distance)) + geom_point() + scale_x_continuous("Planet Number") + ggtitle("Planet Location based on Number") + scale_y_continuous("Distance from Sun (million miles)")
+```
+This scatterplot looks more linear, and is thus a better scatterplot. The direction is still positive, but the form has much improved in that it has become more linear. The points are still relatively tightly clustered, except now in said more linear form.
