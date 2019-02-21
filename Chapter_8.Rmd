@@ -1,0 +1,57 @@
+---
+title: "Chapter 8"
+author: "Bryan Li"
+date: "2/20/2019"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+<style>
+  .2-col {
+    columns: 2 200px;
+    -webkit-columns: 2 200px;
+    -moz-columns: 2 200px;
+  }
+</style>
+
+####16)
+a) Despite the relatively high error, I feel that a linear model is still appropriate here. This is because the data looks somewhat linear, fulfilling the linearity condition. It also compares two quantitative variables. There are no outrageous outliers either.
+
+b) The r-squared of 0.333 (33.3%) means that there is a lot of deviation from the line of fit. Thus the linear model will be quite inaccurate.
+
+####20)
+a) `[attendance] = 517.609 * [wins] + 5773.27`
+b) The attendance for a team with 50 wins is approximately 31654.
+c) The slope of the regression line is just how much the attendance changes as wins increases.
+d) A negative residual would mean the line of fit is overestimating the attendance at a certain number of wins.
+e) The residual for the Cardinals is 10958. This means that the line of fit has underestimated attendance by that number.
+
+####26)
+A simpler explanation for the slumps and the jinx is simply regression to the mean. Since these people on the cover of Sports Illustrated and phenomal rookies have an extreme amount of success, many experience a slump to effectively "balance out" that amount of success, regressing to the mean.
+
+####32)
+a) A linear model is appropriate here due to the comparison between two quantitative variables, a generally-linear dataset, and no extreme outliers.
+b) With an r-squared value of 0.873 (87.3%), it is evident that there is strong evidence of correlation between the amount of teens using marijuana and those using other drugs. To be more specific, 87.3% of the variation in the amount of teens using marjiuana can be explained with the amount of teens using other drugs.
+c) `[other drugs] = 0.571 * [marijuana] - 0.034`
+d) The slope of the line means that, on average, for every increase in % (+1%) of teens using marijuana, there is an increase of 0.571% in the % of teens using other drugs.
+e) These results do not confirm that marijuana is a gateway drug, as correlation does not mean causation. There could be other factors involved - specifically, one factor that affects both, leading someone to believe there is a direct relationship.
+
+####47)
+a) As the amount of calcium in drinking water increases, there are less deaths for men.
+b) `[mortality] = -3.23 * [calcium] + 1676`
+c) With 0 ppm of calcium, there is on average 1676 deaths per 100000 people. For every increase of calcium content (in ppm), there is on average 3.23 *less* deaths per 100000 people.
+d) The residual of -348.6 for the town of Exeter means that the line of fit overestimated the amount of deaths in Exeter by that number.
+e) There are approximately 1353 deaths per 100000 in Derby.
+f) 43% of the variation in mortality can be explained by the amount of calcium in the water.
+
+####48)
+a) Yes, the correct variables were picked as the dependent variable and the predictor. This is because when monitoring alligators from the air, the only obvious number is the length. Thus, the line of fit should predict a weight based on length, which is correct.
+b) The correlation between an alligator's length and weight is 0.914.
+c) `[weight] = 5.9 * [length] - 393`
+d) For every inch an alligator is in length, the estimated weight increases by 5.9 pounds.
+e) I do think the equation will allow the scientists to make accurate predictions, because the r-squared value (which signifies how much of the variation in y-value (weight) is explained by the x-value, length) is 0.836, which is relatively high. I do want to check whether the equation actually does seem to be best fitted by a linear equation, however.
