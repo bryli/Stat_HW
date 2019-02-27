@@ -17,15 +17,15 @@ getpkgs <- function(pkgs){
   }
 }
 
-if (file.exists("cache/yelp_data.Rdata")){
-  load("cache/yelp_data.Rdata")
+if (file.exists("static/yelp_data.Rdata")){
+  load("static/yelp_data.Rdata")
   getpkgs(pkg)
 } else {
   pkg <- c(pkg, "readxl")
   getpkgs(pkg)
   library(readxl)
   yelp_data <- read_excel("yelp data.xlsx") #Replace with path to file
-  save(yelp_data, file="cache/yelp_data.Rdata")
+  save(yelp_data, file="static/yelp_data.Rdata")
 }
 library(ggplot2)
 library(knitr)
@@ -137,22 +137,22 @@ The fact that both z-score means are negative shows that on average the means of
 ####f)
 
 ```{r open_qq, fig.width=5, fig.height=5, message=FALSE, echo=FALSE}
-if (file.exists("cache/open_qqplot.Rdata")){
-  load("cache/open_qqplot.Rdata")
+if (file.exists("static/open_qqplot.Rdata")){
+  load("static/open_qqplot.Rdata")
 } else {
   open_qqplot <- ggplot(data.frame(open_reviews), aes(sample=open_reviews)) + stat_qq() + stat_qq_line() + ggtitle("Q-Q Plot of Open Business Reviews") + scale_y_continuous("Sample Quantities") + scale_x_continuous("Theoretical Quantiles")
-  save(open_qqplot, file="cache/open_qqplot.Rdata")
+  save(open_qqplot, file="static/open_qqplot.Rdata")
 }
 open_qqplot
 
 ```
 
 ```{r closed_qq, fig.width=5, fig.height=5, message=FALSE, echo=FALSE}
-if (file.exists("cache/closed_qqplot.Rdata")){
-  load("cache/closed_qqplot.Rdata")
+if (file.exists("static/closed_qqplot.Rdata")){
+  load("static/closed_qqplot.Rdata")
 } else {
   closed_qqplot <- ggplot(data.frame(closed_reviews), aes(sample=closed_reviews)) + stat_qq() + stat_qq_line() + ggtitle("Q-Q Plot of Closed Business Reviews") + scale_y_continuous("Sample Quantities") + scale_x_continuous("Theoretical Quantiles")
-  save(closed_qqplot, file="cache/closed_qqplot.Rdata")
+  save(closed_qqplot, file="static/closed_qqplot.Rdata")
 }
 closed_qqplot
 ```
