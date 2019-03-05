@@ -1,0 +1,124 @@
+---
+title: "To B(MW) or not to BMW?: Unit 2 Takehome"
+author: "Bryan Li"
+date: "3/2/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(digits=3, stringsAsFactors = FALSE)
+pkg <- c("ggplot2", "knitr", "dplyr", "grid", "gridExtra")
+new.pkg <- pkg[!(pkg %in% installed.packages())]
+if (length(new.pkg)) {
+  install.packages(new.pkg, repos = "http://cran.rstudio.com")
+}
+library(ggplot2)
+library(knitr)
+library(dplyr)
+library(grid)
+library(gridExtra)
+
+car.data <- select(rename(read.csv("static/Unit_2_Takehome/data_th2.csv"), City.FE = City.FE..Guide....Conventional.Fuel, Hwy.FE = Hwy.FE..Guide....Conventional.Fuel), Mfr.Name, City.FE, Hwy.FE)
+BMW.data <- filter(car.data, Mfr.Name == "BMW")
+GM.data <- filter(car.data, Mfr.Name == "General Motors")
+BMW.model <- lm(Hwy.FE ~ City.FE, data=BMW.data)
+#BMW.res <- data.frame(resid = resid(BMW.model), fitted = fitted(BMW.model), order = c(1:length(BMW.data[,1])))
+GM.model <- lm(Hwy.FE ~ City.FE, data=GM.data)
+#GM.res <- data.frame(resid = resid(GM.model), fitted = fitted(GM.model), order = c(1:length(GM.data[,1])))
+
+mt_resid <- function (model, topic) {
+  model_size <- length(model$model[,1])
+  res <- data.frame(
+    resid = resid(model),
+    fitted = fitted(model),
+    order = c(1:model_size)
+  )
+  
+  res.qq <- (ggplot(res, aes(sample = resid))
+    + stat_qq(color='#0e5ba9')
+    + stat_qq_line(color='red')
+    + labs(title = "Normal Probability Plot", x = "Residual", y = "Percent"))
+  
+  res.vfit <- (ggplot(res, aes(x = fitted, y = resid))
+    + geom_point(color='#0e5ba9') + geom_hline(yintercept=0, linetype="dashed")
+    + labs(title = "Versus Fits", x = "Fitted Value", y = "Residual"))
+  
+  res.hist <- (ggplot(res, aes(x = resid))
+    + geom_histogram(color='black', fill='#7da7d9', bins = round(3*model_size^(1/3)))
+    + labs(title = "Histogram", x = "Residual", y = "Frequency"))
+  
+  res.vord <- (ggplot(res, aes(x = order, y = resid))
+    + geom_point(color='#0e5ba9')
+    + geom_line(color='#0e5ba9')
+    + labs(title="Versus Order", x = "Observation Order", y = "Residual"))
+  
+  arrangeGrob(res.qq, res.vfit, res.hist, res.vord,
+               ncol = 2, top = textGrob(paste("Residual Plots for", topic), gp=gpar(fontsize=18)))
+}
+```
+
+####1)
+Can highway mileage be predicted from city mileage better for BMW cars or for General Motor cars?
+
+####2)
+```{r scatterplots, fig.width = 8, fig.height = 3.5, message = FALSE, echo = FALSE}
+BMW.plot <- (ggplot(BMW.data, aes(x=City.FE, y=Hwy.FE))
+  + geom_point(color="#0e5ba9")
+  + geom_smooth(method=lm, se=FALSE, color='red')
+  + labs(title = "Highway FE vs. City FE for BMWs",
+         x = "City Fuel Efficiency (mpg)",
+         y = "Highway Fuel Efficiency (mpg)"))
+GM.plot <- (ggplot(GM.data, aes(x=City.FE, y=Hwy.FE))
+  + geom_point(color="#0e5ba9")
+  + geom_smooth(method=lm, se=FALSE, color='red')
+  + labs(title = "Highway FE vs. City FE for GM cars",
+         x = "City Fuel Efficiency (mpg)",
+         y = "Highway Fuel Efficiency (mpg)"))
+grid.arrange(BMW.plot, GM.plot, ncol = 2)
+```
+
+The graphs appear to have a relatively high correlation. Therefore, there is a high association between highway FE and city FE, which means the question is valid. Additionally, both variables compared are quantitative and the models look somewhat linear with few outliers, so the linear model used will work fine.
+
+####3)
+```{r residplots, fig.width = 12, fig.height = 5, message = FALSE, echo = FALSE}
+grid.arrange(mt_resid(BMW.model, "BMWs"), mt_resid(GM.model, "GM cars"), ncol = 2)
+```
+
+Based on the residual plots, it appears that the residuals are relatively random meaning the linear model applies to the two variables.
+
+####4)
+
+There are no outlying points (calculated by finding residuals greater than two standard deviations from its mean).
+
+####5)
+
+The LSRL for BMWs is $[Highway\text{ }FE] = `r coefficients(BMW.model)[[2]]` * [City\text{ }FE] + `r coefficients(BMW.model)[[1]]`$.
+
+The LSRL for GM cars is $[Highway\text{ }FE] = `r coefficients(GM.model)[[2]]` * [City\text{ }FE] + `r coefficients(GM.model)[[1]]`$.
+
+####6)
+
+The value of the coefficient (a) of the LSRL for BMWs, 1.133, indicates that for every increase in city fuel efficiency there is an predicted increase in highway fuel efficiency of 1.133. The y-intercept (b) of the LSRL for GM cars, 2.196, indicates that when a car has 0 miles per gallon for city fuel efficiency the predicted highway fuel efficiency is 2.196. This is somewhat useless information however as there is no data near 0 thus making it inaccurate there and because a fuel efficiency of 0 mpg is not seen in functioning cars.
+
+####7)
+
+The $\sum{(y - \overline{y})^2}$ for BMWs is $`r sum((BMW.data$Hwy.FE - mean(BMW.data$Hwy.FE))^2)`$ and $`r sum((GM.data$Hwy.FE - mean(GM.data$Hwy.FE))^2)`$ for GM cars.
+
+####8)
+
+The $\sum{(y - \widehat{y})^2}$ for BMWs is $`r sum(resid(BMW.model)^2)`$ and $`r sum(resid(GM.model)^2)`$ for GM cars.
+
+####9)
+
+The r-squared for BMWs is $`r summary(BMW.model)$r.squared`$ and $`r summary(GM.model)$r.squared`$ for GM cars.
+
+####10)
+
+Question 7 gives the total squared error (total variance) of the datasets. This is the combined squared values of the difference between each highway FE value and the mean of the highway FE as a whole. Question 8 gives the total squared residuals of the datasets compared to the line of fit. Question 9 gives the coefficient of determination, which is equal to $1 - [total\text{ }residuals^2]/[total\text{ }variance^2]$ (where residuals is the answer to question 8 and variance is the answer to question 7).
+
+####11)
+
+Given the fact that the variance for BMWs is 3274 and 5461.744 for GM cars, at first glance it may seem that BMWs predict highway mileage better than GM cars. However, based on the residuals, BWMs have a squared residual value of 586.933, whereas GM cars a value of only 473.126. Based on this, along with the r-squared values of 0.821 for BMWs and 0.913 for GM cars, the regression line for Highway FE vs. City FE for GM cars explain more of the total error than that of the regression line for BMWs. Furthermore, the residual plots for GM cars contain a histogram that much more closely resembles a normal distribution, as preferred, whereas the residual plots for BMWs contain a histogram that seems left-skewed.
+
+Therefore, highway mileage can be better predicted from city mileage for GM cars compared to BMWs.
