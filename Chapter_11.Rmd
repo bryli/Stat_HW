@@ -1,0 +1,28 @@
+---
+title: "Chapter 11"
+author: "Bryan Li"
+date: "3/6/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+####15)
+a) I would expect to win 10% of the time.
+b) I would not expect a better result as randomly generated numbers will appear at approximately equal rates.
+
+####17)
+Based on 50000 attempts, I won 5035 games - 10.07% of the games.
+
+####21)
+
+If the player fails the first shot at a 28% chance, he receives 0 points. ($0 \cdot 0.28$)
+
+If the first shot succeeds and the second one fails, he receives 1 point. ($1 \cdot 0.72 \cdot  0.28$)
+
+If both shot succeed, he receives two points. ($2 \cdot 0.72^2$)
+
+The sum of these values is $0 \cdot 0.28 + 1 \cdot 0.72 \cdot  0.28 + 2 \cdot 0.72^2 = 1.2384$. Rounding to an integral value, he will score one point on average.
